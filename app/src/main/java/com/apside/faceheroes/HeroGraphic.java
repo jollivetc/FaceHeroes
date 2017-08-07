@@ -16,8 +16,8 @@ class HeroGraphic extends GraphicOverlay.Graphic {
 
     private Paint mMaskColor;
 
-    private float MASK_SIZE = 30f;
-    private float MASK_WIDTH_FACTOR = 0.25f;
+    private float MASK_STROKE_SIZE = 0.2f;
+    private float MASK_WIDTH_FACTOR = 0.30f;
 
 
     HeroGraphic(GraphicOverlay overlay) {
@@ -25,7 +25,7 @@ class HeroGraphic extends GraphicOverlay.Graphic {
         mMaskColor = new Paint();
         mMaskColor.setColor(Color.BLACK);
         mMaskColor.setStyle(Paint.Style.STROKE);
-        mMaskColor.setStrokeWidth(MASK_SIZE);
+        mMaskColor.setStrokeWidth(MASK_STROKE_SIZE);
     }
 
     @Override
@@ -46,6 +46,7 @@ class HeroGraphic extends GraphicOverlay.Graphic {
                 Math.pow(rightPosition.x - leftPosition.x, 2) +
                         Math.pow(rightPosition.y - leftPosition.y, 2));
         float radius = MASK_WIDTH_FACTOR * distance;
+        mMaskColor.setStrokeWidth(MASK_STROKE_SIZE * distance);
 
         canvas.drawCircle(leftPosition.x, leftPosition.y, radius, mMaskColor);
         canvas.drawCircle(rightPosition.x, rightPosition.y, radius, mMaskColor);
