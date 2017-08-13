@@ -90,8 +90,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Tracker<Face> create (Face face){
 //                return new CircleFacetracker(mGraphicOverlay);
-                 BatmanFacetracker tracker =  new BatmanFacetracker(mGraphicOverlay);
-                tracker.setDrawable(getResources().getDrawable(R.drawable.batman));
+                 HeroFacetracker tracker =  new HeroFacetracker(mGraphicOverlay);
+                if(Math.random()>0.5) {
+                    tracker.setDrawable(getResources().getDrawable(R.drawable.batman));
+                }else{
+                    tracker.setDrawable(getResources().getDrawable(R.drawable.flash));
+                }
                 return tracker;
             }
         };

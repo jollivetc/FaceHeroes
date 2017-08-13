@@ -16,7 +16,7 @@ import java.util.Map;
 class CircleFacetracker extends Tracker<Face> {
 
     private GraphicOverlay mOverlay;
-    private HeroGraphic mHeroGraphic;
+    private CircleGraphic mHeroGraphic;
 
     // Record the previously seen proportions of the landmark locations relative to the bounding box
     // of the face.  These proportions can be used to approximate where the landmarks are within the
@@ -29,7 +29,7 @@ class CircleFacetracker extends Tracker<Face> {
 
     @Override
     public void onNewItem(int i, Face face) {
-        mHeroGraphic = new HeroGraphic(mOverlay);
+        mHeroGraphic = new CircleGraphic(mOverlay);
     }
 
     @Override

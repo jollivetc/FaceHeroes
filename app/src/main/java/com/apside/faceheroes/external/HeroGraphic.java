@@ -1,31 +1,28 @@
 package com.apside.faceheroes;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 
 import com.apside.faceheroes.external.GraphicOverlay;
-
 
 
 class HeroGraphic extends GraphicOverlay.Graphic {
 
     private volatile PointF mLeftPosition;
     private volatile PointF mRightPosition;
+    private final int INTER_EYES = 60;
+    private final int LEFT_BORDER = -90;
+    private final int TOP_BORDER = -144;
+    private final int RIGHT_BORDER = 146;
+    private final int BOTTOM_BORDER = 163;
 
-    private Paint mMaskColor;
-
-    private float MASK_STROKE_SIZE = 0.2f;
-    private float MASK_WIDTH_FACTOR = 0.30f;
+    private Drawable drawable;
 
 
-    HeroGraphic(GraphicOverlay overlay) {
+    HeroGraphic(GraphicOverlay overlay, Drawable drawable) {
         super(overlay);
-        mMaskColor = new Paint();
-        mMaskColor.setColor(Color.BLACK);
-        mMaskColor.setStyle(Paint.Style.STROKE);
-        mMaskColor.setStrokeWidth(MASK_STROKE_SIZE);
+        this.drawable = drawable;
     }
 
     @Override
@@ -41,20 +38,18 @@ class HeroGraphic extends GraphicOverlay.Graphic {
         PointF rightPosition =
                 new PointF(translateX(detectRightPosition.x), translateY(detectRightPosition.y));
 
-        // Use the inter-eye distance to set the size of the eyes.
-        float distance = (float) Math.sqrt(
-                Math.pow(rightPosition.x - leftPosition.x, 2) +
-                        Math.pow(rightPosition.y - leftPosition.y, 2));
-        float radius = MASK_WIDTH_FACTOR * distance;
-        mMaskColor.setStrokeWidth(MASK_STROKE_SIZE * distance);
+        float factor = (rightPosition.x-leftPosition.x)/INTER_EYES;
+        float top = leftPosition.y+TOP_BORDER*factor;
+        float left = leftPosition.x+LEFT_BORDER*factor;
+        float right = leftPosition.x+RIGHT_BORDER*factor;
+        float bottom = leftPosition.y+BOTTOM_BORDER*factor;
+        drawable.setBounds(Math.round(left), Math.round(top), Math.round(right), Math.round(bottom));
+        drawable.draw(canvas);
 
-        canvas.drawCircle(leftPosition.x, leftPosition.y, radius, mMaskColor);
-        canvas.drawCircle(rightPosition.x, rightPosition.y, radius, mMaskColor);
     }
 
     void updateEyes(PointF leftPosition, PointF rightPosition) {
         mLeftPosition = leftPosition;
-
         mRightPosition = rightPosition;
 
         postInvalidate();
