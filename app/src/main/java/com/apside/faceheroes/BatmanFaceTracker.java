@@ -1,6 +1,7 @@
 package com.apside.faceheroes;
 
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 
 import com.apside.faceheroes.external.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
@@ -8,50 +9,56 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
+import com.apside.faceheroes.BatmanGraphic;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-class HeroFacetracker extends Tracker<Face> {
+class BatmanFacetracker extends Tracker<Face> {
 
     private GraphicOverlay mOverlay;
-    private HeroGraphic mHeroGraphic;
+    private BatmanGraphic mBatmanGraphic;
+    private Drawable drawable;
 
     // Record the previously seen proportions of the landmark locations relative to the bounding box
     // of the face.  These proportions can be used to approximate where the landmarks are within the
     // face bounding box if the eye landmark is missing in a future update.
     private Map<Integer, PointF> mPreviousProportions = new HashMap<>();
 
-    HeroFacetracker(GraphicOverlay mGraphicOverlay) {
+    BatmanFacetracker(GraphicOverlay mGraphicOverlay) {
         mOverlay = mGraphicOverlay;
+    }
+
+    public void setDrawable(Drawable drawable){
+        this.drawable = drawable;
     }
 
     @Override
     public void onNewItem(int i, Face face) {
-        mHeroGraphic = new HeroGraphic(mOverlay);
+        mBatmanGraphic = new BatmanGraphic(mOverlay, drawable);
     }
 
     @Override
     public void onUpdate(Detector.Detections<Face> detections, Face face) {
-        mOverlay.add(mHeroGraphic);
+        mOverlay.add(mBatmanGraphic);
 
         updatePreviousProportions(face);
 
         PointF leftPosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
         PointF rightPosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
 
-        mHeroGraphic.updateEyes(leftPosition, rightPosition);
+        mBatmanGraphic.updateEyes(leftPosition, rightPosition);
     }
 
     @Override
     public void onMissing(FaceDetector.Detections<Face> detectionResults) {
-        mOverlay.remove(mHeroGraphic);
+        mOverlay.remove(mBatmanGraphic);
     }
 
     @Override
     public void onDone() {
-        mOverlay.remove(mHeroGraphic);
+        mOverlay.remove(mBatmanGraphic);
     }
 
     private void updatePreviousProportions(Face face) {

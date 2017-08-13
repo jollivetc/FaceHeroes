@@ -19,7 +19,6 @@ import com.apside.faceheroes.external.CameraSourcePreview;
 import com.apside.faceheroes.external.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiActivity;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
@@ -90,7 +89,10 @@ public class MainActivity extends AppCompatActivity {
         MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>(){
             @Override
             public Tracker<Face> create (Face face){
-                return new HeroFacetracker(mGraphicOverlay);
+//                return new CircleFacetracker(mGraphicOverlay);
+                 BatmanFacetracker tracker =  new BatmanFacetracker(mGraphicOverlay);
+                tracker.setDrawable(getResources().getDrawable(R.drawable.batman));
+                return tracker;
             }
         };
         processor = new MultiProcessor.Builder<>(factory).build();
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (hasLowStorage) {
                 Toast.makeText(this, "Face detector cannot be downloaded due to ...", Toast.LENGTH_LONG).show();
-                Log.w(TAG, "Face detector depedencies cannot be downloaded due to ...");
+                Log.w(TAG, "Face detector dependencies cannot be downloaded due to ...");
             }
         }
         return detector;
