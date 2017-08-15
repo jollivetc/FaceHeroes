@@ -89,12 +89,21 @@ public class MainActivity extends AppCompatActivity {
         MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>(){
             @Override
             public Tracker<Face> create (Face face){
-//                return new CircleFacetracker(mGraphicOverlay);
-                 HeroFacetracker tracker =  new HeroFacetracker(mGraphicOverlay);
-                if(Math.random()>0.5) {
-                    tracker.setDrawable(getResources().getDrawable(R.drawable.batman));
-                }else{
-                    tracker.setDrawable(getResources().getDrawable(R.drawable.flash));
+                 HeroFacetracker tracker;
+                int rand = (int) Math.round(Math.random()*4);
+                switch (rand) {
+                    case 0 :
+                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.batman), getResources());
+                        break;
+                    case 1 :
+                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.flash), getResources());
+                        break;
+                    case 2 :
+                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.greenlantern), getResources());
+                        break;
+                   default :
+                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.wonderwoman), getResources());
+                        break;
                 }
                 return tracker;
             }
@@ -103,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         detector.setProcessor(processor);
 
-        if (!detector.isOperational()) {
+        if (!detector.isOperational()) { 
             Log.w(TAG, "Face detector dependencies are not yet available.");
             IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
             boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;

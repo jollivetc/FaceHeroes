@@ -1,5 +1,6 @@
 package com.apside.faceheroes;
 
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 
@@ -20,23 +21,22 @@ class HeroFacetracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
     private HeroGraphic mHeroGraphic;
     private Drawable drawable;
+    private Resources resources;
 
     // Record the previously seen proportions of the landmark locations relative to the bounding box
     // of the face.  These proportions can be used to approximate where the landmarks are within the
     // face bounding box if the eye landmark is missing in a future update.
     private Map<Integer, PointF> mPreviousProportions = new HashMap<>();
 
-    HeroFacetracker(GraphicOverlay mGraphicOverlay) {
+    HeroFacetracker(GraphicOverlay mGraphicOverlay, Drawable drawable, Resources resources) {
         mOverlay = mGraphicOverlay;
-    }
-
-    public void setDrawable(Drawable drawable){
         this.drawable = drawable;
+        this.resources = resources;
     }
 
     @Override
     public void onNewItem(int i, Face face) {
-        mHeroGraphic = new HeroGraphic(mOverlay, drawable);
+        mHeroGraphic = new HeroGraphic(mOverlay, drawable, resources);
     }
 
     @Override
