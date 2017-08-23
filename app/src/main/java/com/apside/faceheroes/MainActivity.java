@@ -11,8 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.hardware.Camera;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
@@ -23,19 +21,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.apside.faceheroes.external.CameraSource;
 import com.apside.faceheroes.external.CameraSourcePreview;
 import com.apside.faceheroes.external.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.vision.CameraSource;
+
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
@@ -60,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
-
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             createCameraSource();
@@ -79,13 +75,33 @@ public class MainActivity extends AppCompatActivity {
                 Date now = new Date();
                 final String formattedDate = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now).toString();
 
+                Bitmap cameraPreviewBitmap = mPreview.getCameraPreviewBitmap();
+
+                View overlayView = getWindow().getDecorView().findViewById(R.id.topLayout);
+                overlayView.setDrawingCacheEnabled(true);
+                Bitmap drawingCache = overlayView.getDrawingCache();
+                Log.i("FaceHero", "DrawingCache is null ? ");
+                if(drawingCache.isRecycled()){
+                    Log.i("FaceHero", "DrawingCache is recycled");
+                }else{
+                    Log.i("FaceHero", "DrawingCache is not reycled ");
+
+                }
+                Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap.getWidth(), cameraPreviewBitmap.getHeight(), cameraPreviewBitmap.getConfig());
+                Canvas canvas = new Canvas(bmOverlay);
+                canvas.drawBitmap(cameraPreviewBitmap, new Matrix(), null);
+                canvas.drawBitmap(drawingCache, 0, 0, null);
+
+                MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay,formattedDate+".jpg", "nice screenshot");
+                overlayView.setDrawingCacheEnabled(false);
+/*
                 try {
                     // image naming and path  to include sd card  appending name you choose for file
                     String mPath = Environment.getExternalStorageDirectory().toString() + "/" + formattedDate + ".jpg";
                     Log.i("FaceHero", "Path = " + mPath);
-                    Log.i("FaceHero", "Preview Size " + mCameraSource.getPreviewSize().toString());
+//                    Log.i("FaceHero", "Preview Size " + mCameraSource.getPreviewSize().toString());
 
-                    mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+                    mCameraSource.takePicture(null, new com.google.android.gms.vision.CameraSource.PictureCallback() {
                         @Override
                         public void onPictureTaken(byte[] bytes) {
                             Bitmap cameraBitmap = decodeCameraBitmap(bytes);
@@ -138,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     // Several error may come out with file handling or DOM
                     e.printStackTrace();
                 }
+                */
             }
         });
     }

@@ -18,23 +18,26 @@ package com.apside.faceheroes.external;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.ViewGroup;
 
 import java.io.IOException;
 
 import com.google.android.gms.common.images.Size;
-import com.google.android.gms.vision.CameraSource;
 
 
-public class CameraSourcePreview extends ViewGroup {
+
+public class CameraSourcePreview extends ViewGroup implements TextureView.SurfaceTextureListener{
     private static final String TAG = "CameraSourcePreview";
 
     private Context mContext;
-    private SurfaceView mSurfaceView;
+    private TextureView mTextureView;
     private boolean mStartRequested;
     private boolean mSurfaceAvailable;
     private CameraSource mCameraSource;
@@ -47,9 +50,9 @@ public class CameraSourcePreview extends ViewGroup {
         mStartRequested = false;
         mSurfaceAvailable = false;
 
-        mSurfaceView = new SurfaceView(context);
-        mSurfaceView.getHolder().addCallback(new SurfaceCallback());
-        addView(mSurfaceView);
+        mTextureView = new TextureView(context);
+        mTextureView.setSurfaceTextureListener(this);
+        addView(mTextureView);
     }
 
     public void start(CameraSource cameraSource) throws IOException {
@@ -83,9 +86,13 @@ public class CameraSourcePreview extends ViewGroup {
         }
     }
 
+    public Bitmap getCameraPreviewBitmap(){
+        return mTextureView.getBitmap();
+    }
+
     private void startIfReady() throws IOException {
         if (mStartRequested && mSurfaceAvailable) {
-            mCameraSource.start(mSurfaceView.getHolder());
+            mCameraSource.start(mTextureView.getSurfaceTexture());
             if (mOverlay != null) {
                 Size size = mCameraSource.getPreviewSize();
                 int min = Math.min(size.getWidth(), size.getHeight());
@@ -101,6 +108,31 @@ public class CameraSourcePreview extends ViewGroup {
             }
             mStartRequested = false;
         }
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
+        mSurfaceAvailable = true;
+        try {
+            startIfReady();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not start camera source.", e);
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+
     }
 
     private class SurfaceCallback implements SurfaceHolder.Callback {
