@@ -80,81 +80,22 @@ public class MainActivity extends AppCompatActivity {
                 View overlayView = getWindow().getDecorView().findViewById(R.id.topLayout);
                 overlayView.setDrawingCacheEnabled(true);
                 Bitmap drawingCache = overlayView.getDrawingCache();
-                Log.i("FaceHero", "DrawingCache is null ? ");
-                if(drawingCache.isRecycled()){
-                    Log.i("FaceHero", "DrawingCache is recycled");
-                }else{
-                    Log.i("FaceHero", "DrawingCache is not reycled ");
 
-                }
-                Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap.getWidth(), cameraPreviewBitmap.getHeight(), cameraPreviewBitmap.getConfig());
+                Log.i("FaceHero", "cameraBitmap is "+cameraPreviewBitmap.getWidth()+" "+cameraPreviewBitmap.getHeight());
+                Log.i("FaceHero", "overlayBitmap is "+drawingCache.getWidth()+" "+drawingCache.getHeight());
+                //Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap.getWidth(), cameraPreviewBitmap.getHeight(), cameraPreviewBitmap.getConfig());
+                //Bitmap bmOverlay = Bitmap.createBitmap(drawingCache.getWidth(), drawingCache.getHeight(), drawingCache.getConfig());
+                Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap);
                 Canvas canvas = new Canvas(bmOverlay);
                 canvas.drawBitmap(cameraPreviewBitmap, new Matrix(), null);
-                canvas.drawBitmap(drawingCache, 0, 0, null);
+                int left = (cameraPreviewBitmap.getWidth() - drawingCache.getWidth()) / 2;
+                int top = (cameraPreviewBitmap.getHeight() - drawingCache.getHeight()) / 2;
 
+                Log.i("FaceHero", "offsets are " + left + " " + top);
+                canvas.drawBitmap(drawingCache, 0,0, null);
                 MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay,formattedDate+".jpg", "nice screenshot");
                 overlayView.setDrawingCacheEnabled(false);
-/*
-                try {
-                    // image naming and path  to include sd card  appending name you choose for file
-                    String mPath = Environment.getExternalStorageDirectory().toString() + "/" + formattedDate + ".jpg";
-                    Log.i("FaceHero", "Path = " + mPath);
-//                    Log.i("FaceHero", "Preview Size " + mCameraSource.getPreviewSize().toString());
 
-                    mCameraSource.takePicture(null, new com.google.android.gms.vision.CameraSource.PictureCallback() {
-                        @Override
-                        public void onPictureTaken(byte[] bytes) {
-                            Bitmap cameraBitmap = decodeCameraBitmap(bytes);
-                            // create bitmap screen capture
-                            View overlayView = getWindow().getDecorView().findViewById(R.id.topLayout);
-                            overlayView.setDrawingCacheEnabled(true);
-                            Bitmap overlayBitmap = getOverlayBitmap(overlayView);
-                            Log.i("FaceHero", "RootView is " + overlayView.getWidth() + " " + overlayView.getHeight());
-                            Bitmap bmFinal = Bitmap.createBitmap((int)(Math.round(cameraBitmap.getWidth()/3.2)),
-                                    (int)(Math.round(cameraBitmap.getHeight()/3.2)),
-                                    overlayBitmap.getConfig());
-                            Bitmap mirroredCameraBitmap = getResizedAndMirroredCameraBitmap(cameraBitmap, bmFinal);
-
-                            Log.i("FaceHero", "Camera is " + cameraBitmap.getWidth() + " " + cameraBitmap.getHeight());
-                            Log.i("FaceHero", "Overlay is " + overlayBitmap.getWidth() + " " + overlayBitmap.getHeight());
-
-                            Canvas canvas = new Canvas(bmFinal);
-                            //canvas.drawBitmap(mirroredCameraBitmap, new Matrix(), null);
-                            canvas.drawBitmap(mirroredCameraBitmap, 0,0, null);
-                            //BitmapDrawable overlayDrawable = new BitmapDrawable(getResources(), overlayBitmap);
-                            //overlayDrawable.setBounds(-180,0,bmFinal.getWidth()-180, bmFinal.getHeight());
-                            //Bitmap croppedOverlay = Bitmap.createBitmap(overlayBitmap, 0, overlayBitmap.getHeight()-mirroredCameraBitmap.getHeight(), mirroredCameraBitmap.getWidth(), overlayBitmap.getHeight());
-                            //Bitmap croppedOverlay = Bitmap.createBitmap(overlayBitmap, 0, 0, mirroredCameraBitmap.getWidth(), mirroredCameraBitmap.getHeight());
-                            //overlayDrawable.draw(canvas);
-                            canvas.drawBitmap(overlayBitmap, 180, 0, null);
-                            Log.i("FaceHero", "mirroredCameraBitmap is " + mirroredCameraBitmap.getWidth() + " " + mirroredCameraBitmap.getHeight());
-                            //Log.i("FaceHero", "croppedOverlay is " + croppedOverlay.getWidth() + " " + croppedOverlay.getHeight());
-                            MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmFinal,formattedDate + "3.jpg", "nice screenshot");
-                            overlayView.setDrawingCacheEnabled(false);
-                        }
-
-                        private Bitmap getResizedAndMirroredCameraBitmap(Bitmap cameraBitmap, Bitmap bmFinal) {
-                            Bitmap resizeCameraImage = Bitmap.createScaledBitmap(cameraBitmap, bmFinal.getWidth(), bmFinal.getHeight(), false);
-                            Matrix m = new Matrix();
-                            m.preScale(-1, 1);
-                            return Bitmap.createBitmap(resizeCameraImage, 0, 0, resizeCameraImage.getWidth(), resizeCameraImage.getHeight(), m, false);
-                        }
-
-                        private Bitmap getOverlayBitmap(View rootView) {
-                            return rootView.getDrawingCache();
-                        }
-
-                        private Bitmap decodeCameraBitmap(byte[] bytes) {
-                            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        }
-                    });
-                    Log.i("FaceHero", "Screenshot !");
-
-                } catch (Throwable e) {
-                    // Several error may come out with file handling or DOM
-                    e.printStackTrace();
-                }
-                */
             }
         });
     }
