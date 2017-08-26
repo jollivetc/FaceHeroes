@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Bitmap cameraPreviewBitmap = mPreview.getCameraPreviewBitmap();
 
-                View overlayView = getWindow().getDecorView().findViewById(R.id.topLayout);
+                View overlayView = getWindow().getDecorView().findViewById(R.id.faceOverlay);
                 overlayView.setDrawingCacheEnabled(true);
                 Bitmap drawingCache = overlayView.getDrawingCache();
 
