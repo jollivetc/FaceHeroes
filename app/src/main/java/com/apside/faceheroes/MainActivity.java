@@ -17,6 +17,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -34,7 +36,9 @@ import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource mCameraSource=null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
+
+    private List<Mask> mListMask = new ArrayList<>();
+    MaskAdapter mMaskAdapter;
+
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -68,8 +76,25 @@ public class MainActivity extends AppCompatActivity {
             requestStoragePermission();
         }
 
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(layoutManager);
 
-        mPreview.setOnClickListener(new View.OnClickListener() {
+        //TODO load data
+        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
+                R.drawable.batman), "Batman"));
+        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
+                R.drawable.wonderwoman), "Wonder Woman"));
+        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
+                R.drawable.greenlantern), "Green Lantern"));
+        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
+                R.drawable.flash),"Flash"));
+
+        mMaskAdapter = new MaskAdapter(mListMask);
+        mRecyclerView.setAdapter(mMaskAdapter);
+
+        findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Date now = new Date();
@@ -83,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.i("FaceHero", "cameraBitmap is "+cameraPreviewBitmap.getWidth()+" "+cameraPreviewBitmap.getHeight());
                 Log.i("FaceHero", "overlayBitmap is "+drawingCache.getWidth()+" "+drawingCache.getHeight());
-                //Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap.getWidth(), cameraPreviewBitmap.getHeight(), cameraPreviewBitmap.getConfig());
-                //Bitmap bmOverlay = Bitmap.createBitmap(drawingCache.getWidth(), drawingCache.getHeight(), drawingCache.getConfig());
                 Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap);
                 Canvas canvas = new Canvas(bmOverlay);
                 canvas.drawBitmap(cameraPreviewBitmap, new Matrix(), null);

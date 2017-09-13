@@ -3,18 +3,35 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/topLayout"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true" >
 
     <com.apside.faceheroes.external.CameraSourcePreview
         android:id="@+id/preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:background="#3700E4"
+        android:layout_height="wrap_content">
         <com.apside.faceheroes.external.GraphicOverlay
             android:id="@+id/faceOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </com.apside.faceheroes.external.CameraSourcePreview>
+    <Button
+        android:id="@+id/captureBtn"
+        android:layout_toRightOf="@id/preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#37AEE4"
+        android:text="@string/button_text" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_below="@id/captureBtn"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#AA0000"/>
+
+
 </RelativeLayout>

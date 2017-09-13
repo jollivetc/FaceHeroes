@@ -157,6 +157,12 @@ public class CameraSourcePreview extends ViewGroup implements TextureView.Surfac
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        //super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(1456, 1092);
+    }
+
+    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int width = 320;
         int height = 240;
