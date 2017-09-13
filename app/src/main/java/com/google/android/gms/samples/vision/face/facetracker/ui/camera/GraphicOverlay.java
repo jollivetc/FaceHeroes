@@ -1,4 +1,4 @@
-package com.apside.faceheroes.external;
+package com.google.android.gms.samples.vision.face.facetracker.ui.camera;
 
 /*
  * Copyright (C) The Android Open Source Project

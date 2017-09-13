@@ -4,13 +4,12 @@ import android.content.res.Resources;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 
-import com.apside.faceheroes.external.GraphicOverlay;
+import com.google.android.gms.samples.vision.face.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
-import com.apside.faceheroes.HeroGraphic;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.apside.faceheroes.external;
+package com.google.android.gms.samples.vision.face.facetracker.ui.camera;
 
 /*
  * Copyright (C) The Android Open Source Project
@@ -23,14 +23,13 @@ import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.ViewGroup;
 
 import java.io.IOException;
 
 import com.google.android.gms.common.images.Size;
-
+import com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSource;
 
 
 public class CameraSourcePreview extends ViewGroup implements TextureView.SurfaceTextureListener{
@@ -159,7 +158,11 @@ public class CameraSourcePreview extends ViewGroup implements TextureView.Surfac
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(1456, 1092);
+        if(isPortraitMode()){
+            setMeasuredDimension(1092,820);
+        }else {
+            setMeasuredDimension(1456, 1092);
+        }
     }
 
     @Override

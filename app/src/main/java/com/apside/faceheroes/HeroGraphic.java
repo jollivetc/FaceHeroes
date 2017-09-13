@@ -10,7 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.util.Size;
 
-import com.apside.faceheroes.external.GraphicOverlay;
+import com.google.android.gms.samples.vision.face.facetracker.ui.camera.GraphicOverlay;
 
 
 class HeroGraphic extends GraphicOverlay.Graphic {

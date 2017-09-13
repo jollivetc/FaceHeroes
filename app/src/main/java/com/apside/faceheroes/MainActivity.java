@@ -8,24 +8,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.os.Environment;
+import android.hardware.Camera;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.apside.faceheroes.external.CameraSource;
-import com.apside.faceheroes.external.CameraSourcePreview;
-import com.apside.faceheroes.external.GraphicOverlay;
+import com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSource;
+import com.google.android.gms.samples.vision.face.facetracker.ui.camera.CameraSourcePreview;
+import com.google.android.gms.samples.vision.face.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             requestStoragePermission();
         }
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
+/*        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         mMaskAdapter = new MaskAdapter(mListMask);
         mRecyclerView.setAdapter(mMaskAdapter);
-
+*/
         findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
                 .setRequestedPreviewSize(320, 240)
                 .setRequestedFps(60.0f)
-                .setAutoFocusEnabled(true)
+                .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .build();
 
     }

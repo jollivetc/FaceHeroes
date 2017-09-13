@@ -20,7 +20,7 @@
     </com.google.android.gms.samples.vision.face.facetracker.ui.camera.CameraSourcePreview>
     <Button
         android:id="@+id/captureBtn"
-        android:layout_below="@id/preview"
+        android:layout_toRightOf="@id/preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#37AEE4"
@@ -28,7 +28,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
-        android:layout_toRightOf="@id/captureBtn"
+        android:layout_below="@id/captureBtn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#AA0000"/>
