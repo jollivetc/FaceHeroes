@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.hardware.Camera;
@@ -16,6 +17,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -44,9 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource mCameraSource=null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLinearLayoutManager;
 
     private List<Mask> mListMask = new ArrayList<>();
-    MaskAdapter mMaskAdapter;
+    private MaskAdapter mMaskAdapter;
 
 
     private static final int RC_HANDLE_GMS = 9001;
@@ -73,10 +78,9 @@ public class MainActivity extends AppCompatActivity {
             requestStoragePermission();
         }
 
-/*        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         //TODO load data
         mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
@@ -90,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
         mMaskAdapter = new MaskAdapter(mListMask);
         mRecyclerView.setAdapter(mMaskAdapter);
-*/
+        mMaskAdapter.notifyItemInserted(mListMask.size());
+
         findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mPreview.stop();
+//        mPreview.stop();
     }
 
 
@@ -161,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>(){
             @Override
             public Tracker<Face> create (Face face){
-                 HeroFacetracker tracker;
+                 HeroFacetracker tracker=null;
                 int rand = (int) Math.round(Math.random()*4);
                 switch (rand) {
                     case 0 :

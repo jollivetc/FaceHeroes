@@ -5,15 +5,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 
 import java.util.List;
 
 
 
-public class MaskAdapter extends RecyclerView.Adapter<MaskAdapter.ViewHolder> {
+public class MaskAdapter extends RecyclerView.Adapter<MaskAdapter.MaskHolder> {
 
     private List<Mask> mMaskList;
 
@@ -21,28 +21,41 @@ public class MaskAdapter extends RecyclerView.Adapter<MaskAdapter.ViewHolder> {
         this.mMaskList = maskList;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
-        ImageView image;
-        TextView text;
-        ViewHolder(View v){
+    public static class MaskHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        private ImageView mImageView;
+
+        private Mask mMask;
+
+        private static final String MASK_KEY = "MASK";
+
+        public MaskHolder(View v){
             super(v);
-            //image = (ImageView) v.findViewById(R.id.image1);
-            text = (TextView) v.findViewById(android.R.id.text1);
-            Log.i("FaceHero", "Yeah");
+            mImageView = (ImageView) v.findViewById(R.id.image1);
+            v.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("RecyclerView", "CLICK !");
+        }
+
+        public void bindMask(Mask mask){
+            mMask = mask;
+            mImageView.setImageBitmap(mask.getBitmap());
         }
     }
 
     @Override
-    public MaskAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MaskAdapter.MaskHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View view = layoutInflater.inflate(android.R.layout.simple_selectable_list_item, parent, false);
-        return new ViewHolder(view);
+        View view = layoutInflater.inflate(R.layout.mask_row, parent, false);
+        return new MaskHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(MaskAdapter.ViewHolder holder, int position) {
-        //holder.image.setImageBitmap(mMaskList.get(position).getBitmap());
-        holder.text.setText(mMaskList.get(position).getName());
+    public void onBindViewHolder(MaskAdapter.MaskHolder holder, int position) {
+        Mask mask = mMaskList.get(position);
+        holder.bindMask(mask);
     }
 
     @Override
