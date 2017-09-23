@@ -32,6 +32,10 @@ class HeroGraphic extends GraphicOverlay.Graphic {
         this.resources = resources;
     }
 
+    public void setDrawable(Drawable drawable) {
+        this.drawable = drawable;
+    }
+
     @Override
     public void draw(Canvas canvas) {
         PointF detectLeftPosition = mLeftPosition;

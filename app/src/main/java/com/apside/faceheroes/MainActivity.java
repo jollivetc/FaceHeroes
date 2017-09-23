@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Mask> mListMask = new ArrayList<>();
     private MaskAdapter mMaskAdapter;
+    private final List<HeroFacetracker> trackerList = new ArrayList<>();
 
 
     private static final int RC_HANDLE_GMS = 9001;
@@ -84,15 +85,15 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO load data
         mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.batman), "Batman"));
+                R.drawable.batman), getResources().getDrawable(R.drawable.batman), "Batman"));
         mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.wonderwoman), "Wonder Woman"));
+                R.drawable.wonderwoman), getResources().getDrawable(R.drawable.wonderwoman), "Wonder Woman"));
         mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.greenlantern), "Green Lantern"));
+                R.drawable.greenlantern), getResources().getDrawable(R.drawable.greenlantern), "Green Lantern"));
         mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.flash),"Flash"));
+                R.drawable.flash), getResources().getDrawable(R.drawable.flash), "Flash"));
 
-        mMaskAdapter = new MaskAdapter(mListMask);
+        mMaskAdapter = new MaskAdapter(mListMask, trackerList);
         mRecyclerView.setAdapter(mMaskAdapter);
         mMaskAdapter.notifyItemInserted(mListMask.size());
 
@@ -128,14 +129,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         startCameraSource();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        mPreview.stop();
+        mPreview.stop();
     }
 
 
@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                         tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.wonderwoman), getResources());
                         break;
                 }
+                trackerList.add(tracker);
                 return tracker;
             }
         };
