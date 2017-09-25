@@ -38,7 +38,7 @@ class HeroFacetracker extends Tracker<Face> {
         mHeroGraphic = new HeroGraphic(mOverlay, drawable, resources);
     }
 
-    public void setMask(Drawable drawable) {
+    void setMask(Drawable drawable) {
         this.drawable = drawable;
         this.mHeroGraphic.setDrawable(drawable);
     }

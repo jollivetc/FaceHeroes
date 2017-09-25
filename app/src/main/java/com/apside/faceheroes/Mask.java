@@ -10,18 +10,14 @@ class Mask {
     private Drawable drawable;
     private String name;
 
-    public Mask(Bitmap bitmap, Drawable drawable, String name) {
+    Mask(Bitmap bitmap, Drawable drawable, String name) {
         this.bitmap = bitmap;
         this.drawable = drawable;
         this.name = name;
     }
 
-    public Bitmap getBitmap(){
+    Bitmap getBitmap(){
         return bitmap;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Drawable getDrawable() {

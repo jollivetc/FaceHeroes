@@ -43,6 +43,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG="FaceTracker";
+    public static final String PHOTO_ID = "PHOTO_ID";
 
     private CameraSource mCameraSource=null;
     private CameraSourcePreview mPreview;
@@ -122,6 +123,10 @@ public class MainActivity extends AppCompatActivity {
                 MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay,formattedDate+".jpg", "nice screenshot");
                 overlayView.setDrawingCacheEnabled(false);
 
+                Context context = view.getContext();
+                Intent showForm = new Intent(context, MailActivity.class);
+                showForm.putExtra(PHOTO_ID, formattedDate + ".jpg");
+                context.startActivity(showForm);
             }
         });
     }

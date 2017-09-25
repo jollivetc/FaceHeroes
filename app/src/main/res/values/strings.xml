@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">FaceHeroes</string>
     <string name="button_text">Smile</string>
+    <string name="send_picture">Envoyez moi la photo</string>
+    <string name="adresse_mail">Adresse mail</string>
+    <string name="prenom">Prénom</string>
+    <string name="nom">Nom</string>
+    <string name="name">Nom</string>
 </resources>
