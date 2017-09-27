@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements MaskRequester.MaskRequesterResponse{
 
     private static final String TAG="FaceTracker";
     public static final String PHOTO_ID = "PHOTO_ID";
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private GraphicOverlay mGraphicOverlay;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
+    private MaskRequester mMaskRequester;
 
     private List<Mask> mListMask = new ArrayList<>();
     private MaskAdapter mMaskAdapter;
@@ -97,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         mMaskAdapter = new MaskAdapter(mListMask, trackerList);
         mRecyclerView.setAdapter(mMaskAdapter);
         mMaskAdapter.notifyItemInserted(mListMask.size());
+
+        mMaskRequester = new MaskRequester(this);
+        try {
+            mMaskRequester.getMask();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         mCameraSource = new CameraSource.Builder(context, detector)
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
-                .setRequestedPreviewSize(320, 240)
+                .setRequestedPreviewSize(1440, 1080)
                 .setRequestedFps(60.0f)
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .build();
@@ -280,5 +288,11 @@ public class MainActivity extends AppCompatActivity {
                 mCameraSource = null;
             }
         }
+    }
+
+    @Override
+    public void receivedNewPhoto(Mask newMask) {
+        //TODO
+        Log.e("FaceHero", "do your work !");
     }
 }
