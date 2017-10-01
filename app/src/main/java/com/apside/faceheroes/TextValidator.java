@@ -10,7 +10,7 @@ public abstract class TextValidator implements TextWatcher{
     protected TextView textView;
 
     public TextValidator(TextView textView) {
-
+        this.textView = textView;
     }
 
     @Override
