@@ -60,11 +60,8 @@ public class MaskRequester {
                 try{
                     JSONObject responseJSON= new JSONObject(response.body().string());
                     JSONArray masks = responseJSON.getJSONArray("masks");
-                    for(int maskIndex = 0 ; maskIndex<masks.length(); maskIndex++) {
-                        JSONObject mask = masks.getJSONObject(maskIndex);
-                        Object created_at = mask.get("created_at");
-                        Log.i("FaceHero", "type of mask " + created_at.getClass());
-                    }
+                    MaskDownloadTask maskDownloadTask = new MaskDownloadTask();
+                    maskDownloadTask.execute(masks);
                 } catch (JSONException e) {
                     mLoadingData = false;
                     e.printStackTrace();
