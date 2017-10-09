@@ -50,7 +50,7 @@ public class MaskAdapter extends RecyclerView.Adapter<MaskAdapter.MaskHolder> {
 
         public void bindMask(Mask mask){
             mMask = mask;
-            mImageView.setImageBitmap(mask.getBitmap());
+            mImageView.setImageDrawable(mask.getDrawable());
         }
     }
 

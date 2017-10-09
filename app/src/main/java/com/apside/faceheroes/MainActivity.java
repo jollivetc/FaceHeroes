@@ -91,14 +91,10 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         //TODO load data
-        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.batman), getResources().getDrawable(R.drawable.batman), "Batman"));
-        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.wonderwoman), getResources().getDrawable(R.drawable.wonderwoman), "Wonder Woman"));
-        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.greenlantern), getResources().getDrawable(R.drawable.greenlantern), "Green Lantern"));
-        mListMask.add(new Mask(BitmapFactory.decodeResource(this.getApplicationContext().getResources(),
-                R.drawable.flash), getResources().getDrawable(R.drawable.flash), "Flash"));
+        mListMask.add(new Mask(getResources().getDrawable(R.drawable.batman), "Batman"));
+        mListMask.add(new Mask(getResources().getDrawable(R.drawable.wonderwoman), "Wonder Woman"));
+        mListMask.add(new Mask(getResources().getDrawable(R.drawable.greenlantern), "Green Lantern"));
+        mListMask.add(new Mask(getResources().getDrawable(R.drawable.flash), "Flash"));
 
         mMaskAdapter = new MaskAdapter(mListMask, trackerList);
         mRecyclerView.setAdapter(mMaskAdapter);

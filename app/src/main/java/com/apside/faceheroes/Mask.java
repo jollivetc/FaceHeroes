@@ -6,18 +6,15 @@ import android.graphics.drawable.Drawable;
 
 class Mask {
 
-    private Bitmap bitmap;
     private Drawable drawable;
     private String name;
 
-    Mask(Bitmap bitmap, Drawable drawable, String name) {
-        this.bitmap = bitmap;
+    Mask(Drawable drawable, String name) {
         this.drawable = drawable;
         this.name = name;
     }
-
-    Bitmap getBitmap(){
-        return bitmap;
+    Mask(String name){
+        this.name = name;
     }
 
     public Drawable getDrawable() {
