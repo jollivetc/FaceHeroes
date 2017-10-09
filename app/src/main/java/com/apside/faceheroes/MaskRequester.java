@@ -28,7 +28,7 @@ public class MaskRequester {
     private Context mContext;
     private Calendar mCalendar;
     private OkHttpClient mClient;
-    private static final String BASE_URL = "https://apside-devfest.cappuccinoo.fr/";
+    public static final String BASE_URL = "https://apside-devfest.cappuccinoo.fr/";
     public static final String MASK_LIST_URL = "api/masks/all/2";
     public static final String MASK_URL = "masks/";
     private boolean mLoadingData;
@@ -52,7 +52,7 @@ public class MaskRequester {
             @Override
             public void onFailure(Call call, IOException e) {
                 mLoadingData = false;
-                e.printStackTrace();
+                Log.e("FaceHeroes", "Error on downloading the list of masks", e);
             }
 
             @Override
@@ -60,11 +60,12 @@ public class MaskRequester {
                 try{
                     JSONObject responseJSON= new JSONObject(response.body().string());
                     JSONArray masks = responseJSON.getJSONArray("masks");
-                    MaskDownloadTask maskDownloadTask = new MaskDownloadTask();
+                    MaskDownloadTask maskDownloadTask = new MaskDownloadTask(mContext);
                     maskDownloadTask.execute(masks);
                 } catch (JSONException e) {
+                    Log.e("FaceHeroes", "Error on parsing result of the list of masks", e);
+                }finally {
                     mLoadingData = false;
-                    e.printStackTrace();
                 }
             }
         });

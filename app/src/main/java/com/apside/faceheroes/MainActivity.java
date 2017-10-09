@@ -37,6 +37,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
     private LinearLayoutManager mLinearLayoutManager;
     private MaskRequester mMaskRequester;
 
-    private List<Mask> mListMask = new ArrayList<>();
+    public static List<Mask> mListMask = Collections.synchronizedList(new ArrayList<Mask>());
     private MaskAdapter mMaskAdapter;
     private final List<HeroFacetracker> trackerList = new ArrayList<>();
 
