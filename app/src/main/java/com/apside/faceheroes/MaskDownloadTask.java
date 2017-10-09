@@ -2,10 +2,12 @@ package com.apside.faceheroes;
 
 
 import android.Manifest;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -51,18 +53,21 @@ public class MaskDownloadTask extends AsyncTask<JSONArray, Integer, Long> {
                 }
 
                 String maskUrl = MaskRequester.BASE_URL + MaskRequester.MASK_URL + filename;
-                Bitmap maskBitmap = downloadBitmap(maskUrl);
-                if (maskBitmap != null) {
-                    try {
-                        FileOutputStream out = new FileOutputStream(file.getAbsoluteFile());
-                        maskBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                        out.flush();
-                        out.close();
-                        Log.i("FaceHeroes", filename + " downloaded");
-                    } catch (Exception e) {
-                        Log.e("FaceHeroes", "Error on mask file save", e);
-                    }
-                }
+                DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+
+                Uri downloadUri = Uri.parse(maskUrl);
+                DownloadManager.Request request = new DownloadManager.Request(
+                        downloadUri);
+
+                request.setAllowedNetworkTypes(
+                        DownloadManager.Request.NETWORK_WIFI
+                                | DownloadManager.Request.NETWORK_MOBILE)
+                        .setAllowedOverRoaming(false).setTitle("Demo")
+                        .setDescription("Something useful. No, really.")
+                        .setDestinationInExternalPublicDir("/masks", filename);
+
+                mgr.enqueue(request);
+                
             } catch (JSONException e) {
                 Log.e("FaceHerores", "error on parsing json", e);
             }
