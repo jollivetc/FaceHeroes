@@ -3,6 +3,8 @@ package com.apside.faceheroes;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -40,18 +42,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-public class MainActivity extends AppCompatActivity  implements MaskRequester.MaskRequesterResponse{
+public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG="FaceTracker";
+    private static final String TAG = "FaceTracker";
     public static final String PHOTO_ID = "PHOTO_ID";
 
-    private CameraSource mCameraSource=null;
+    private CameraSource mCameraSource = null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private MaskRequester mMaskRequester;
+    private BroadcastReceiver downloadReceiver;
 
     public static List<Mask> mListMask = Collections.synchronizedList(new ArrayList<Mask>());
     private MaskAdapter mMaskAdapter;
@@ -74,7 +78,7 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             createCameraSource();
-        }else{
+        } else {
             requestCameraPermission();
         }
         int rs = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -100,9 +104,11 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
         mRecyclerView.setAdapter(mMaskAdapter);
         mMaskAdapter.notifyItemInserted(mListMask.size());
 
-        mMaskRequester = new MaskRequester(this);
+        updateMaskList();
+
+
         try {
-            mMaskRequester.getMask();
+            mMaskRequester.getMasksList();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -119,8 +125,8 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
                 overlayView.setDrawingCacheEnabled(true);
                 Bitmap drawingCache = overlayView.getDrawingCache();
 
-                Log.i("FaceHero", "cameraBitmap is "+cameraPreviewBitmap.getWidth()+" "+cameraPreviewBitmap.getHeight());
-                Log.i("FaceHero", "overlayBitmap is "+drawingCache.getWidth()+" "+drawingCache.getHeight());
+                Log.i("FaceHero", "cameraBitmap is " + cameraPreviewBitmap.getWidth() + " " + cameraPreviewBitmap.getHeight());
+                Log.i("FaceHero", "overlayBitmap is " + drawingCache.getWidth() + " " + drawingCache.getHeight());
                 Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap);
                 Canvas canvas = new Canvas(bmOverlay);
                 canvas.drawBitmap(cameraPreviewBitmap, new Matrix(), null);
@@ -128,8 +134,8 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
                 int top = (cameraPreviewBitmap.getHeight() - drawingCache.getHeight()) / 2;
 
                 Log.i("FaceHero", "offsets are " + left + " " + top);
-                canvas.drawBitmap(drawingCache, 0,0, null);
-                MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay,formattedDate+".jpg", "nice screenshot");
+                canvas.drawBitmap(drawingCache, 0, 0, null);
+                MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay, formattedDate + ".jpg", "nice screenshot");
                 overlayView.setDrawingCacheEnabled(false);
 
                 Context context = view.getContext();
@@ -138,6 +144,27 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
                 context.startActivity(showForm);
             }
         });
+    }
+
+    private void updateMaskList() {
+        mMaskRequester = new MaskRequester(this);
+
+        downloadReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+                    Log.i("FaceHeroes", "Download complete " + intent.toString());
+                    Set<String> extras = intent.getExtras().keySet();
+                    for(String key : extras){
+                        Log.i("FaceHeroes", "extras : " + key);
+                    }
+                }
+            }
+        };
+        registerReceiver(downloadReceiver, new IntentFilter(
+                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
     }
 
     @Override
@@ -151,7 +178,6 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
         super.onPause();
         mPreview.stop();
     }
-
 
 
     private void createCameraSource() {
@@ -177,22 +203,22 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
                 .setMinFaceSize(0.15f)
                 .build();
         Detector.Processor<Face> processor;
-        MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>(){
+        MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
             @Override
-            public Tracker<Face> create (Face face){
-                 HeroFacetracker tracker=null;
-                int rand = (int) Math.round(Math.random()*4);
+            public Tracker<Face> create(Face face) {
+                HeroFacetracker tracker = null;
+                int rand = (int) Math.round(Math.random() * 4);
                 switch (rand) {
-                    case 0 :
+                    case 0:
                         tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.batman), getResources());
                         break;
-                    case 1 :
+                    case 1:
                         tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.flash), getResources());
                         break;
-                    case 2 :
+                    case 2:
                         tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.greenlantern), getResources());
                         break;
-                   default :
+                    default:
                         tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.wonderwoman), getResources());
                         break;
                 }
@@ -228,7 +254,7 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
         }
         final Activity thisActivity = this;
 
-        View.OnClickListener listener =new View.OnClickListener() {
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityCompat.requestPermissions(thisActivity, permissions, RC_HANDLE_CAMERA_PERM);
@@ -241,7 +267,7 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
                 .show();
     }
 
-    private void requestStoragePermission(){
+    private void requestStoragePermission() {
         Log.w(TAG, "storage permission is not granted, Requesting permission");
 
         final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -252,7 +278,7 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
         }
         final Activity thisActivity = this;
 
-        View.OnClickListener listener =new View.OnClickListener() {
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityCompat.requestPermissions(thisActivity, permissions, RC_WRITE_STORAGE_PERM);
@@ -268,9 +294,10 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mCameraSource != null){
+        if (mCameraSource != null) {
             mCameraSource.release();
         }
+        unregisterReceiver(downloadReceiver);
     }
 
     private void startCameraSource() {
@@ -280,20 +307,15 @@ public class MainActivity extends AppCompatActivity  implements MaskRequester.Ma
             dlg.show();
         }
 
-        if (mCameraSource != null){
-            try{
+        if (mCameraSource != null) {
+            try {
                 mPreview.start(mCameraSource, mGraphicOverlay);
-            }catch(IOException e){
-                Log.e(TAG, "Unable to start camera source.",e);
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to start camera source.", e);
                 mCameraSource.release();
                 mCameraSource = null;
             }
         }
     }
 
-    @Override
-    public void receivedNewPhoto(Mask newMask) {
-        //TODO
-        Log.e("FaceHero", "do your work !");
-    }
 }
