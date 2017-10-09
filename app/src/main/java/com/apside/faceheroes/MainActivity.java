@@ -10,10 +10,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -37,17 +38,22 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "FaceTracker";
     public static final String PHOTO_ID = "PHOTO_ID";
+
+    public final static String MASK_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath()+"/masks";
 
     private CameraSource mCameraSource = null;
     private CameraSourcePreview mPreview;
@@ -58,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver downloadReceiver;
 
     public static List<Mask> mListMask = Collections.synchronizedList(new ArrayList<Mask>());
+    private Map<String, Mask> maskMap = new HashMap<>();
+
     private MaskAdapter mMaskAdapter;
     private final List<HeroFacetracker> trackerList = new ArrayList<>();
 
@@ -90,24 +98,19 @@ public class MainActivity extends AppCompatActivity {
         mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-        //TODO load data
-        mListMask.add(new Mask(getResources().getDrawable(R.drawable.batman), "Batman"));
-        mListMask.add(new Mask(getResources().getDrawable(R.drawable.wonderwoman), "Wonder Woman"));
-        mListMask.add(new Mask(getResources().getDrawable(R.drawable.greenlantern), "Green Lantern"));
-        mListMask.add(new Mask(getResources().getDrawable(R.drawable.flash), "Flash"));
-
-        mMaskAdapter = new MaskAdapter(mListMask, trackerList);
-        mRecyclerView.setAdapter(mMaskAdapter);
-        mMaskAdapter.notifyItemInserted(mListMask.size());
-
-        updateMaskList();
-
+        checkForNewMasks();
+        loadMask();
+        mListMask.addAll(maskMap.values());
 
         try {
             mMaskRequester.getMasksList();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        mMaskAdapter = new MaskAdapter(mListMask, trackerList);
+        mRecyclerView.setAdapter(mMaskAdapter);
+        mMaskAdapter.notifyItemInserted(mListMask.size());
 
         findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,9 +143,22 @@ public class MainActivity extends AppCompatActivity {
                 context.startActivity(showForm);
             }
         });
+        getMaskNameList();
     }
 
-    private void updateMaskList() {
+    private void loadMask() {
+        List<String> maskNameList = getMaskNameList();
+
+        for (String maskName : maskNameList) {
+            if (maskMap.containsKey(maskName)) {
+                continue;
+            }
+            Mask mask = new Mask(Drawable.createFromPath(MASK_DIRECTORY+"/"+maskName), maskName);
+            maskMap.put(maskName, mask);
+        }
+    }
+
+    private void checkForNewMasks() {
         mMaskRequester = new MaskRequester(this);
 
         downloadReceiver = new BroadcastReceiver() {
@@ -151,16 +167,25 @@ public class MainActivity extends AppCompatActivity {
                 String action = intent.getAction();
                 if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
                     Log.i("FaceHeroes", "Download complete " + intent.toString());
-                    Set<String> extras = intent.getExtras().keySet();
-                    for(String key : extras){
-                        Log.i("FaceHeroes", "extras : " + key);
-                    }
+
                 }
             }
         };
         registerReceiver(downloadReceiver, new IntentFilter(
                 DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
+    }
+
+    private List<String> getMaskNameList(){
+        List<String> fileNames = new ArrayList<>();
+        File directory = new File(MASK_DIRECTORY);
+        Log.i("FaceHeroes", "target Folder read: " + directory.getAbsolutePath());
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            fileNames.add(file.getName());
+        }
+        Log.i("FaceHeroes", "files names : " + fileNames.toString());
+        return fileNames;
     }
 
     @Override
@@ -203,21 +228,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Tracker<Face> create(Face face) {
                 HeroFacetracker tracker = null;
-                int rand = (int) Math.round(Math.random() * 4);
-                switch (rand) {
-                    case 0:
-                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.batman), getResources());
-                        break;
-                    case 1:
-                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.flash), getResources());
-                        break;
-                    case 2:
-                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.greenlantern), getResources());
-                        break;
-                    default:
-                        tracker = new HeroFacetracker(mGraphicOverlay, getResources().getDrawable(R.drawable.wonderwoman), getResources());
-                        break;
-                }
+                int rand = (int) Math.round(Math.random() * mListMask.size());
+                tracker = new HeroFacetracker(mGraphicOverlay, mListMask.get(rand).getDrawable(), getResources());
                 trackerList.add(tracker);
                 return tracker;
             }

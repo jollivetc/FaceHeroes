@@ -58,10 +58,10 @@ public class MaskRequester {
     }
 
     private void downloadMasks(JSONArray masks){
-        File storage = Environment.getExternalStorageDirectory();
-        File folder = new File(storage.getAbsoluteFile(), "masks");//the dot makes this directory hidden to the user
+        File folder = new File(MainActivity.MASK_DIRECTORY);//the dot makes this directory hidden to the user
+        Log.i("FaceHeroes", "target Folder : " + folder.getAbsolutePath());
         if (folder.exists()) {
-            boolean created = folder.mkdir();
+            folder.mkdir();
         }
         for(int maskIndex = 0 ; maskIndex<masks.length(); maskIndex++) {
             try {
