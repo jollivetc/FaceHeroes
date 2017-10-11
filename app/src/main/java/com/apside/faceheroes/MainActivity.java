@@ -3,7 +3,6 @@ package com.apside.faceheroes;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,14 +41,11 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -126,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 new CountDownTimer(3000, 1000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        Snackbar.make(mGraphicOverlay, "Souriez dans "+millisUntilFinished/1000, 800)
+                        Snackbar.make(mGraphicOverlay, "Souriez dans " + millisUntilFinished / 1000, 800)
                                 .show();
                     }
 
@@ -160,9 +156,6 @@ public class MainActivity extends AppCompatActivity {
                         context.startActivity(showForm);
                     }
                 }.start();
-
-
-
             }
         });
         getMaskNameList();
@@ -188,18 +181,11 @@ public class MainActivity extends AppCompatActivity {
     private List<String> getMaskNameList(){
         List<String> fileNames = new ArrayList<>();
         File directory = new File(MASK_DIRECTORY);
-        Log.i("FaceHeroes", "target Folder read: " + directory.getAbsolutePath());
         File[] files = directory.listFiles();
-        Log.i("FaceHeroes", "size array list" + files.length);
-        Set<File> filesSet = new HashSet<File>(Arrays.asList(files));
-        Log.i("FaceHeroes", "size file set" + filesSet.size());
         for (File file : files) {
             fileNames.add(file.getName());
         }
         Collections.sort(fileNames);
-        Log.i("FaceHeroes", "files names : " + fileNames.toString());
-        Log.i("FaceHeroes", "files names in Set: " + new HashSet<String>(fileNames).size());
-
         return fileNames;
     }
 
@@ -242,9 +228,8 @@ public class MainActivity extends AppCompatActivity {
         MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
             @Override
             public Tracker<Face> create(Face face) {
-                HeroFacetracker tracker = null;
                 int rand = (int) Math.round(Math.random() * mListMask.size());
-                tracker = new HeroFacetracker(mGraphicOverlay, mListMask.get(rand).getDrawable(), getResources());
+                HeroFacetracker tracker = new HeroFacetracker(mGraphicOverlay, mListMask.get(rand).getDrawable(), getResources());
                 trackerList.add(tracker);
                 return tracker;
             }

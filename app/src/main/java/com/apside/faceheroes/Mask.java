@@ -1,6 +1,5 @@
 package com.apside.faceheroes;
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 
@@ -11,9 +10,6 @@ class Mask {
 
     Mask(Drawable drawable, String name) {
         this.drawable = drawable;
-        this.name = name;
-    }
-    Mask(String name){
         this.name = name;
     }
 
