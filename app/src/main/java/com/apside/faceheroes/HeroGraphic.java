@@ -17,8 +17,8 @@ class HeroGraphic extends GraphicOverlay.Graphic {
 
     private volatile PointF mLeftPosition;
     private volatile PointF mRightPosition;
-    private final static int TEMPLATE_WIDTH = 227;
-    private final static int TEMPLATE_HEIGHT = 288;
+    private final static int TEMPLATE_WIDTH = 310;
+    private final static int TEMPLATE_HEIGHT = 310;
 
     private final static int TEMPLATE_INTER_EYES_DISTANCE = 60;
 
