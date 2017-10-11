@@ -14,6 +14,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
@@ -101,7 +102,11 @@ public class MainActivity extends AppCompatActivity {
         gridLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
 
-        checkForNewMasks();
+        try {
+            checkForNewMasks();
+        } catch (IOException e) {
+            Log.e("FaceHeroes", "Error downloading masks", e);
+        }
         loadMask();
         mListMask.clear();
         mListMask.addAll(maskMap.values());
@@ -109,11 +114,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i("FaceHeroes", "size map " + maskMap.size());
         Log.i("FaceHeroes", "size list " + mListMask.size());
 
-        try {
-            mMaskRequester.getMasksList();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         mMaskAdapter = new MaskAdapter(mListMask, trackerList);
         mRecyclerView.setAdapter(mMaskAdapter);
@@ -121,33 +121,48 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Date now = new Date();
-                final String formattedDate = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now).toString();
+            public void onClick(final View view) {
 
-                Bitmap cameraPreviewBitmap = mPreview.getCameraPreviewBitmap();
+                new CountDownTimer(3000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        Snackbar.make(mGraphicOverlay, "Souriez dans "+millisUntilFinished/1000, 800)
+                                .show();
+                    }
 
-                View overlayView = getWindow().getDecorView().findViewById(R.id.faceOverlay);
-                overlayView.setDrawingCacheEnabled(true);
-                Bitmap drawingCache = overlayView.getDrawingCache();
+                    @Override
+                    public void onFinish() {
+                        Date now = new Date();
+                        final String formattedDate = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now).toString();
 
-                Log.i("FaceHero", "cameraBitmap is " + cameraPreviewBitmap.getWidth() + " " + cameraPreviewBitmap.getHeight());
-                Log.i("FaceHero", "overlayBitmap is " + drawingCache.getWidth() + " " + drawingCache.getHeight());
-                Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap);
-                Canvas canvas = new Canvas(bmOverlay);
-                canvas.drawBitmap(cameraPreviewBitmap, new Matrix(), null);
-                int left = (cameraPreviewBitmap.getWidth() - drawingCache.getWidth()) / 2;
-                int top = (cameraPreviewBitmap.getHeight() - drawingCache.getHeight()) / 2;
+                        Bitmap cameraPreviewBitmap = mPreview.getCameraPreviewBitmap();
 
-                Log.i("FaceHero", "offsets are " + left + " " + top);
-                canvas.drawBitmap(drawingCache, 0, 0, null);
-                MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay, formattedDate + ".jpg", "nice screenshot");
-                overlayView.setDrawingCacheEnabled(false);
+                        View overlayView = getWindow().getDecorView().findViewById(R.id.faceOverlay);
+                        overlayView.setDrawingCacheEnabled(true);
+                        Bitmap drawingCache = overlayView.getDrawingCache();
 
-                Context context = view.getContext();
-                Intent showForm = new Intent(context, MailActivity.class);
-                showForm.putExtra(PHOTO_ID, formattedDate + ".jpg");
-                context.startActivity(showForm);
+                        Log.i("FaceHero", "cameraBitmap is " + cameraPreviewBitmap.getWidth() + " " + cameraPreviewBitmap.getHeight());
+                        Log.i("FaceHero", "overlayBitmap is " + drawingCache.getWidth() + " " + drawingCache.getHeight());
+                        Bitmap bmOverlay = Bitmap.createBitmap(cameraPreviewBitmap);
+                        Canvas canvas = new Canvas(bmOverlay);
+                        canvas.drawBitmap(cameraPreviewBitmap, new Matrix(), null);
+                        int left = (cameraPreviewBitmap.getWidth() - drawingCache.getWidth()) / 2;
+                        int top = (cameraPreviewBitmap.getHeight() - drawingCache.getHeight()) / 2;
+
+                        Log.i("FaceHero", "offsets are " + left + " " + top);
+                        canvas.drawBitmap(drawingCache, 0, 0, null);
+                        MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay, formattedDate + ".jpg", "nice screenshot");
+                        overlayView.setDrawingCacheEnabled(false);
+
+                        Context context = view.getContext();
+                        Intent showForm = new Intent(context, MailActivity.class);
+                        showForm.putExtra(PHOTO_ID, formattedDate + ".jpg");
+                        context.startActivity(showForm);
+                    }
+                }.start();
+
+
+
             }
         });
         getMaskNameList();
@@ -165,22 +180,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkForNewMasks() {
+    private void checkForNewMasks() throws IOException {
         mMaskRequester = new MaskRequester(this);
-
-        downloadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                    Log.i("FaceHeroes", "Download complete " + intent.toString());
-
-                }
-            }
-        };
-        registerReceiver(downloadReceiver, new IntentFilter(
-                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
+        mMaskRequester.getMasksList();
     }
 
     private List<String> getMaskNameList(){
@@ -318,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
         if (mCameraSource != null) {
             mCameraSource.release();
         }
-        unregisterReceiver(downloadReceiver);
     }
 
     private void startCameraSource() {
