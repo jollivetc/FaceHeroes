@@ -20,7 +20,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -41,11 +41,14 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private RecyclerView mRecyclerView;
-    private LinearLayoutManager mLinearLayoutManager;
+    private GridLayoutManager gridLayoutManager;
     private MaskRequester mMaskRequester;
     private BroadcastReceiver downloadReceiver;
 
@@ -95,12 +98,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        gridLayoutManager = new GridLayoutManager(this, 2);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
 
         checkForNewMasks();
         loadMask();
+        mListMask.clear();
         mListMask.addAll(maskMap.values());
+
+        Log.i("FaceHeroes", "size map " + maskMap.size());
+        Log.i("FaceHeroes", "size list " + mListMask.size());
 
         try {
             mMaskRequester.getMasksList();
@@ -181,10 +188,16 @@ public class MainActivity extends AppCompatActivity {
         File directory = new File(MASK_DIRECTORY);
         Log.i("FaceHeroes", "target Folder read: " + directory.getAbsolutePath());
         File[] files = directory.listFiles();
+        Log.i("FaceHeroes", "size array list" + files.length);
+        Set<File> filesSet = new HashSet<File>(Arrays.asList(files));
+        Log.i("FaceHeroes", "size file set" + filesSet.size());
         for (File file : files) {
             fileNames.add(file.getName());
         }
+        Collections.sort(fileNames);
         Log.i("FaceHeroes", "files names : " + fileNames.toString());
+        Log.i("FaceHeroes", "files names in Set: " + new HashSet<String>(fileNames).size());
+
         return fileNames;
     }
 
