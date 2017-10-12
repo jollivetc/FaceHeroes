@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,6 +25,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URL;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
@@ -42,7 +50,7 @@ public class MailActivity extends AppCompatActivity {
 
         mImageView = (ImageView) findViewById(R.id.imageView);
 
-        File f = findLastFile("/storage/emulated/0/Pictures");
+        final File f = findLastFile("/storage/emulated/0/Pictures");
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(), options);
@@ -58,12 +66,18 @@ public class MailActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validate()) {
+                Log.i("FaceHeroes", "you will send");
+               /* if(validate()) {
                     String firstName = mFirstNameField.getText().toString();
                     String lastName = mLastNameField.getText().toString();
                     String mail = mMailField.getText().toString();
                     Log.i("FaceHeroes", "Prepare mail to " + mail);
                     //TODO upload and send mail
+                }*/
+                try {
+                    upload(f.getAbsolutePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -126,28 +140,51 @@ public class MailActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    public String getStringImage(Bitmap bmp){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
+    public String upload(String filename) throws IOException {
+        PictureUploader pictureUploader = new PictureUploader();
+        pictureUploader.execute(filename);
+        return "";
     }
 
-    public void upload(String filepath) throws IOException
-    {
- /*       HttpClient httpclient = new DefaultHttpClient();
-        httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-        HttpPost httppost = new HttpPost("url");
-        File file = new File(filepath);
-        MultipartEntity mpEntity = new MultipartEntity();
-        ContentBody cbFile = new FileBody(file, "image/jpeg");
-        mpEntity.addPart("userfile", cbFile);
-        httppost.setEntity(mpEntity);
-        System.out.println("executing request " + httppost.getRequestLine());
-        HttpResponse response = httpclient.execute(httppost);
-        HttpEntity resEntity = response.getEntity();
-  */      // check the response and do what is required
+    private class PictureUploader extends AsyncTask<String, Integer, Long> {
+        protected Long doInBackground(String... fileName) {
+            Log.i("FaceHeroes", "prepare mail");
+            String url = "https://apside-devfest.cappuccinoo.fr/api/pics/save-picture";
+            final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/*");
+
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("picture", fileName[0], RequestBody.create(MEDIA_TYPE_JPG, fileName[0]))
+                    .addFormDataPart("firstName", "Bob")
+                    .addFormDataPart("lastName", "Dupont")
+                    .addFormDataPart("email", "bob@apside.fr")
+                    .build();
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+
+            OkHttpClient client = new OkHttpClient();
+            String res = null;
+            try {
+                okhttp3.Response response = client.newCall(request).execute();
+                res = response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.i("FaceHeroes", res);
+            Log.e("FaceHeroes", "Response : " + res);
+            return 0L;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(Long result) {
+
+        }
     }
 
 }

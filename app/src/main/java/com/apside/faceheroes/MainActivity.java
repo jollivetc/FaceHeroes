@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     // permission request codes need to be < 256
     private static final int RC_HANDLE_CAMERA_PERM = 2;
     private static final int RC_WRITE_STORAGE_PERM = 3;
+    private static final int RC_READ_STORAGE_PERM = 4;
 
 
     @Override
@@ -92,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
         int rs = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (rs != PackageManager.PERMISSION_GRANTED) {
             requestStoragePermission();
+        }
+        int rr = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (rr != PackageManager.PERMISSION_GRANTED) {
+            requestReadingPermission();
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
@@ -276,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestStoragePermission() {
-        Log.w(TAG, "storage permission is not granted, Requesting permission");
+        Log.w(TAG, "storage writing permission is not granted, Requesting permission");
 
         final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -294,6 +299,30 @@ public class MainActivity extends AppCompatActivity {
         };
 
         Snackbar.make(mGraphicOverlay, "Access to the storage is needed for screenshot",
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction("OK", listener)
+                .show();
+    }
+
+    private void requestReadingPermission() {
+        Log.w(TAG, "storage reading permission is not granted, Requesting permission");
+
+        final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            ActivityCompat.requestPermissions(this, permissions, RC_READ_STORAGE_PERM);
+            return;
+        }
+        final Activity thisActivity = this;
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityCompat.requestPermissions(thisActivity, permissions, RC_READ_STORAGE_PERM);
+            }
+        };
+
+        Snackbar.make(mGraphicOverlay, "Access to the storage is needed for sending emails",
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", listener)
                 .show();
