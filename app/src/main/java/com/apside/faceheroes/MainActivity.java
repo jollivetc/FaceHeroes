@@ -147,13 +147,13 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.i("FaceHero", "offsets are " + left + " " + top);
                         canvas.drawBitmap(drawingCache, 0, 0, null);
-                        MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay, formattedDate + ".jpg", "nice screenshot");
+                        MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay, formattedDate, "nice screenshot");
                         overlayView.setDrawingCacheEnabled(false);
 
                         Context context = view.getContext();
                         Intent showForm = new Intent(context, MailActivity.class);
-                        showForm.putExtra(PHOTO_ID, formattedDate + ".jpg");
                         context.startActivity(showForm);
+
                     }
                 }.start();
             }
