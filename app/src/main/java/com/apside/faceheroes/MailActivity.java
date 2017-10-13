@@ -150,11 +150,11 @@ public class MailActivity extends AppCompatActivity {
         protected Long doInBackground(String... fileName) {
             Log.i("FaceHeroes", "prepare mail");
             String url = "https://apside-devfest.cappuccinoo.fr/api/pics/save-picture";
-            final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/*");
+            final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpeg");
 
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
-                    .addFormDataPart("picture", fileName[0], RequestBody.create(MEDIA_TYPE_JPG, fileName[0]))
+                    .addFormDataPart("picture", fileName[0], RequestBody.create(MEDIA_TYPE_JPG, new File(fileName[0])))
                     .addFormDataPart("firstName", "Bob")
                     .addFormDataPart("lastName", "Dupont")
                     .addFormDataPart("email", "bob@apside.fr")
