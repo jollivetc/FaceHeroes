@@ -67,17 +67,17 @@ public class MailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("FaceHeroes", "you will send");
-               /* if(validate()) {
+                if(validate()) {
                     String firstName = mFirstNameField.getText().toString();
                     String lastName = mLastNameField.getText().toString();
                     String mail = mMailField.getText().toString();
                     Log.i("FaceHeroes", "Prepare mail to " + mail);
                     //TODO upload and send mail
-                }*/
-                try {
-                    upload(f.getAbsolutePath());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        upload(new UploadData(firstName, lastName, mail, f.getAbsolutePath()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -146,18 +146,32 @@ public class MailActivity extends AppCompatActivity {
         return "";
     }
 
-    private class PictureUploader extends AsyncTask<String, Integer, Long> {
-        protected Long doInBackground(String... fileName) {
+    private class UploadData{
+        String firstName;
+        String lastName;
+        String mail;
+        String photoPath;
+
+        public UploadData(String firstName, String lastName, String mail, String photoPath) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.mail = mail;
+            this.photoPath = photoPath;
+        }
+    }
+
+    private class PictureUploader extends AsyncTask<UploadData, Integer, Long> {
+        protected Long doInBackground(UploadData... data) {
             Log.i("FaceHeroes", "prepare mail");
             String url = "https://apside-devfest.cappuccinoo.fr/api/pics/save-picture";
             final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpeg");
 
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
-                    .addFormDataPart("picture", fileName[0], RequestBody.create(MEDIA_TYPE_JPG, new File(fileName[0])))
-                    .addFormDataPart("firstName", "Bob")
-                    .addFormDataPart("lastName", "Dupont")
-                    .addFormDataPart("email", "bob@apside.fr")
+                    .addFormDataPart("picture", data[0].photoPath, RequestBody.create(MEDIA_TYPE_JPG, new File(data[0].photoPath)))
+                    .addFormDataPart("firstName", data[0].firstName)
+                    .addFormDataPart("lastName", data[0].lastName)
+                    .addFormDataPart("email", data[0].mail)
                     .build();
 
             Request request = new Request.Builder()
