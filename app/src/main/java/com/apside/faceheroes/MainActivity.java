@@ -187,8 +187,10 @@ public class MainActivity extends AppCompatActivity {
         List<String> fileNames = new ArrayList<>();
         File directory = new File(MASK_DIRECTORY);
         File[] files = directory.listFiles();
-        for (File file : files) {
-            fileNames.add(file.getName());
+        if (files != null) {
+            for (File file : files) {
+                fileNames.add(file.getName());
+            }
         }
         Collections.sort(fileNames);
         return fileNames;

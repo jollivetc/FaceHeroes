@@ -140,7 +140,7 @@ public class MailActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    public String upload(String filename) throws IOException {
+    public String upload(UploadData filename) throws IOException {
         PictureUploader pictureUploader = new PictureUploader();
         pictureUploader.execute(filename);
         return "";
