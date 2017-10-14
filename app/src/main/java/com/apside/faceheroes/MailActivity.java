@@ -75,6 +75,7 @@ public class MailActivity extends AppCompatActivity {
                     //TODO upload and send mail
                     try {
                         upload(new UploadData(firstName, lastName, mail, f.getAbsolutePath()));
+                        new SendMail(MailActivity.this.getBaseContext(), "christophe.jollivet@gmail.com", "test", "contenu du message");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
