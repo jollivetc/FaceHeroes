@@ -76,6 +76,7 @@ public class CameraSourcePreview extends ViewGroup implements TextureView.Surfac
         if (mCameraSource != null) {
             mCameraSource.stop();
         }
+        mSurfaceAvailable = false;
     }
 
     public void release() {
@@ -83,6 +84,7 @@ public class CameraSourcePreview extends ViewGroup implements TextureView.Surfac
             mCameraSource.release();
             mCameraSource = null;
         }
+        mSurfaceAvailable = false;
     }
 
     public Bitmap getCameraPreviewBitmap(){
