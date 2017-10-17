@@ -1,6 +1,8 @@
 package com.apside.faceheroes;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,10 +13,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -66,6 +70,7 @@ public class MailActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dismissKeyboard(MailActivity.this);
                 Log.i("FaceHeroes", "you will send");
                 if(validate()) {
                     String firstName = mFirstNameField.getText().toString();
@@ -75,13 +80,23 @@ public class MailActivity extends AppCompatActivity {
                     //TODO upload and send mail
                     try {
                         upload(new UploadData(firstName, lastName, mail, f.getAbsolutePath()));
-                        new SendMail(MailActivity.this.getBaseContext(), "christophe.jollivet@gmail.com", "test", "contenu du message");
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }else{
+                    Snackbar.make(MailActivity.this.mImageView, "Veuillez saisir les informations",  2000)
+                            .show();
                 }
             }
         });
+    }
+
+    private void dismissKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (null != activity.getCurrentFocus())
+            imm.hideSoftInputFromWindow(activity.getCurrentFocus()
+                    .getApplicationWindowToken(), 0);
     }
 
     private File findLastFile(String directory){
@@ -105,9 +120,9 @@ public class MailActivity extends AppCompatActivity {
     }
 
     private boolean validate(){
-        return StringUtils.isBlank(mLastNameField.getError().toString()) &&
-                StringUtils.isBlank(mFirstNameField.getError().toString()) &&
-                StringUtils.isBlank(mMailField.getError().toString());
+        return (mLastNameField.getError() == null || StringUtils.isBlank(mLastNameField.getError().toString())) &&
+                (mFirstNameField.getError() == null || StringUtils.isBlank(mFirstNameField.getError().toString()) )&&
+                (mMailField.getError() == null || StringUtils.isBlank(mMailField.getError().toString()));
 
     }
 
@@ -115,14 +130,17 @@ public class MailActivity extends AppCompatActivity {
         MailFormValidator lastNameValidator = new MailFormValidator(mLastNameField);
         mLastNameField.addTextChangedListener(lastNameValidator);
         mLastNameField.setOnFocusChangeListener(lastNameValidator);
+        lastNameValidator.validate(mLastNameField);
 
         MailFormValidator firstNameValidator = new MailFormValidator(mFirstNameField);
         mFirstNameField.addTextChangedListener(firstNameValidator);
         mFirstNameField.setOnFocusChangeListener(firstNameValidator);
+        firstNameValidator.validate(mFirstNameField);
 
         MailFormValidator mailValidator = new MailFormValidator(mMailField);
         mMailField.addTextChangedListener(mailValidator);
         mMailField.setOnFocusChangeListener(mailValidator);
+        mailValidator.validate(mMailField);
     }
 
 
@@ -173,6 +191,7 @@ public class MailActivity extends AppCompatActivity {
                     .addFormDataPart("firstName", data[0].firstName)
                     .addFormDataPart("lastName", data[0].lastName)
                     .addFormDataPart("email", data[0].mail)
+                    .addFormDataPart("pass", Configuration.UPLOAD_PASS)
                     .build();
 
             Request request = new Request.Builder()
@@ -185,11 +204,14 @@ public class MailActivity extends AppCompatActivity {
             try {
                 okhttp3.Response response = client.newCall(request).execute();
                 res = response.body().string();
+                Snackbar.make(MailActivity.this.mImageView, "La photo est partie !",  2000)
+                        .show();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("FaceHeroes", "Error on upload ", e);
+                Snackbar.make(MailActivity.this.mImageView, "Erreur pendant l'envoi",  2000)
+                        .show();
             }
             Log.i("FaceHeroes", res);
-            Log.e("FaceHeroes", "Response : " + res);
             return 0L;
         }
 

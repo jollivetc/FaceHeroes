@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.captureBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                findViewById(R.id.captureBtn).setEnabled(false);
 
                 new CountDownTimer(3000, 1000) {
                     @Override
@@ -154,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                         canvas.drawBitmap(drawingCache, 0, 0, null);
                         MediaStore.Images.Media.insertImage(MainActivity.this.getContentResolver(), bmOverlay, formattedDate, "nice screenshot");
                         overlayView.setDrawingCacheEnabled(false);
-
+                        findViewById(R.id.captureBtn).setEnabled(true);
                         Context context = view.getContext();
                         Intent showForm = new Intent(context, MailActivity.class);
                         context.startActivity(showForm);
